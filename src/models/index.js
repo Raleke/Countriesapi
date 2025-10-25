@@ -1,4 +1,3 @@
-require('dotenv').config();
 const { Sequelize, DataTypes } = require('sequelize');
 const CountryModel = require('./country');
 const MetadataModel = require('./metadata');
@@ -13,10 +12,10 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     logging: false,
     dialectOptions: {
-      ssl: {
+      ssl: process.env.DB_SSL === 'true' ? {
         require: true,
         rejectUnauthorized: false
-      },
+      } : false,
       connectTimeout: 60000
     },
     pool: {

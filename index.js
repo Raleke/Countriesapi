@@ -31,6 +31,7 @@ if (!fs.existsSync(cacheDir)) {
 
 (async () => {
   try {
+    console.log('Attempting to connect to database...');
     await sequelize.authenticate();
     console.log(' Database connection established successfully.');
     await sequelize.sync({ alter: true });
@@ -40,6 +41,7 @@ if (!fs.existsSync(cacheDir)) {
     app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
   } catch (error) {
     console.error(' Failed to start server:', error.message);
+    console.error('Full error details:', error);
     process.exit(1);
   }
 })();
