@@ -3,14 +3,14 @@ const path = require('path');
 const { createCanvas, loadImage } = require('canvas');
 
 /**
- * Generates and saves a summary image containing total countries,
+ * Generates a summary image containing total countries,
  * top 5 by GDP, and timestamp.
- * 
+ *
  * @param {Object} data
  * @param {number} data.total - Total number of countries
  * @param {Array} data.top5 - Array of top 5 countries [{ name, estimated_gdp, flag_url }]
  * @param {string} data.timestamp - ISO date string
- * @returns {Promise<string>} - Path to saved image
+ * @returns {Promise<Buffer>} - Image buffer
  */
 const generateSummaryImage = async ({ total, top5, timestamp }) => {
   try {
@@ -24,7 +24,7 @@ const generateSummaryImage = async ({ total, top5, timestamp }) => {
     ctx.fillStyle = '#222';
     ctx.font = 'bold 26px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('🌍 Countries Summary', width / 2, 50);
+    ctx.fillText(' Countries Summary', width / 2, 50);
     ctx.font = '18px sans-serif';
     ctx.fillText(`Total Countries: ${total}`, width / 2, 100);
 
@@ -59,15 +59,10 @@ const generateSummaryImage = async ({ total, top5, timestamp }) => {
 
       ctx.fillText(`${i + 1}. ${country.name}: ${gdpFormatted}`, textX, y);
     }
-    const cacheDir = path.join(__dirname, '../../cache');
-    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
-
-    const outputPath = path.join(cacheDir, 'summary.png');
     const buffer = canvas.toBuffer('image/png');
-    fs.writeFileSync(outputPath, buffer);
 
-    console.log(` Summary image generated: ${outputPath}`);
-    return outputPath;
+    console.log(' Summary image generated');
+    return buffer;
   } catch (error) {
     console.error(' Error generating summary image:', error);
     throw new Error('Failed to generate summary image');
