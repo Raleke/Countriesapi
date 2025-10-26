@@ -11,19 +11,19 @@ const generateSummaryImage = async ({ total, top5, timestamp, outPath }) => {
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = '#333';
-  ctx.font = 'bold 24px Arial';
+  ctx.font = 'bold 24px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('Countries Summary', width / 2, 50);
 
-  ctx.font = '18px Arial';
+  ctx.font = '18px sans-serif';
   ctx.fillText(`Total Countries: ${total}`, width / 2, 100);
 
-  ctx.font = '14px Arial';
+  ctx.font = '14px sans-serif';
   ctx.fillText(`Last Refreshed: ${new Date(timestamp).toLocaleString()}`, width / 2, 130);
-  ctx.font = 'bold 20px Arial';
+  ctx.font = 'bold 20px sans-serif';
   ctx.fillText('Top 5 Countries by Estimated GDP', width / 2, 180);
 
-  ctx.font = '16px Arial';
+  ctx.font = '16px sans-serif';
   top5.forEach((country, index) => {
     const y = 220 + index * 30;
     ctx.fillText(`${index + 1}. ${country.name}: $${country.estimated_gdp.toFixed(2)}`, 50, y);

@@ -26,7 +26,7 @@ app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 const cacheDir = path.join(__dirname, 'cache');
 if (!fs.existsSync(cacheDir)) {
   fs.mkdirSync(cacheDir, { recursive: true });
-  console.log('📁 Created cache directory');
+  console.log('Created cache directory');
 }
 
 (async () => {
@@ -39,9 +39,8 @@ if (!fs.existsSync(cacheDir)) {
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
-  } catch (error) {
-    console.error(' Failed to start server:', error.message);
-    console.error('Full error details:', error);
+} catch (error) {
+    console.error(' Unable to start server:', error.message);
     process.exit(1);
   }
 })();
