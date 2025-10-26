@@ -106,22 +106,7 @@ exports.refresh = async (req, res) => {
       );
     });
 
-    const top5 = await Country.findAll({
-      order: [['estimated_gdp', 'DESC']],
-      limit: 5,
-    });
-    const imagePath = path.join(__dirname, '..', '..', 'cache', 'summary.png');
-    await generateSummaryImage({
-      total: await Country.count(),
-      top5: top5.map((c) => ({
-        name: c.name,
-        estimated_gdp: Number(c.estimated_gdp || 0),
-      })),
-      timestamp: now.toISOString(),
-      outPath: imagePath,
-    }).catch((err) =>
-      console.error('Image generation failed (non-fatal):', err.message)
-    );
+    // Image generation removed from refresh; now done on-demand in getImage
 
     return res.json({ success: true, refreshed_at: now.toISOString() });
   } catch (err) {
@@ -200,11 +185,28 @@ exports.deleteOne = async (req, res) => {
 
 exports.getImage = async (req, res) => {
   try {
-    const imagePath = path.join(__dirname, '..', '..', 'cache', 'summary.png');
-    if (!fs.existsSync(imagePath))
-      return res.status(404).json({ error: 'Summary image not found' });
-    return res.sendFile(imagePath);
+    const total = await Country.count();
+    const top5 = await Country.findAll({
+      order: [['estimated_gdp', 'DESC']],
+      limit: 5,
+    });
+    const metadata = await Metadata.findOne({ where: { key: 'last_refreshed_at' } });
+    const timestamp = metadata ? metadata.value : new Date().toISOString();
+
+    const buffer = await generateSummaryImage({
+      total,
+      top5: top5.map((c) => ({
+        name: c.name,
+        estimated_gdp: Number(c.estimated_gdp || 0),
+        flag_url: c.flag_url,
+      })),
+      timestamp,
+    });
+
+    res.set('Content-Type', 'image/png');
+    return res.send(buffer);
   } catch (err) {
+    console.error('Image generation error:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

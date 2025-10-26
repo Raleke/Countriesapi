@@ -1,9 +1,8 @@
 const { createCanvas, loadImage } = require('canvas');
-const fs = require('fs');
 
-const generateSummaryImage = async ({ total, top5, timestamp, outPath }) => {
+const generateSummaryImage = async ({ total, top5, timestamp }) => {
   const width = 800;
-  const height = 600;
+  const height = 700; // Increased height to accommodate flag images
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
@@ -24,13 +23,33 @@ const generateSummaryImage = async ({ total, top5, timestamp, outPath }) => {
   ctx.fillText('Top 5 Countries by Estimated GDP', width / 2, 180);
 
   ctx.font = '16px sans-serif';
-  top5.forEach((country, index) => {
-    const y = 220 + index * 30;
-    ctx.fillText(`${index + 1}. ${country.name}: $${country.estimated_gdp.toFixed(2)}`, 50, y);
-  });
+  for (let index = 0; index < top5.length; index++) {
+    const country = top5[index];
+    const y = 220 + index * 50; // Increased spacing for images
+    const textX = 120; // Shift text to the right to make space for flag
+
+    // Draw flag image if available
+    if (country.flag_url) {
+      try {
+        const flagImage = await loadImage(country.flag_url);
+        ctx.drawImage(flagImage, 50, y - 25, 50, 30); // Draw flag at 50x30 size
+      } catch (err) {
+        console.warn(`Failed to load flag for ${country.name}:`, err.message);
+        // Draw a placeholder box if flag fails to load
+        ctx.fillStyle = '#ccc';
+        ctx.fillRect(50, y - 25, 50, 30);
+        ctx.strokeStyle = '#999';
+        ctx.strokeRect(50, y - 25, 50, 30);
+        ctx.fillStyle = '#333';
+      }
+    }
+
+    // Draw country text
+    ctx.fillText(`${index + 1}. ${country.name}: $${country.estimated_gdp.toFixed(2)}`, textX, y);
+  }
 
   const buffer = canvas.toBuffer('image/png');
-  fs.writeFileSync(outPath, buffer);
+  return buffer;
 };
 
 module.exports = { generateSummaryImage };
