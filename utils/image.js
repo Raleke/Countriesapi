@@ -1,6 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const { createCanvas, loadImage } = require('canvas');
+const { createCanvas, loadImage, registerFont } = require('canvas');
+
+// Register Open Sans fonts
+registerFont(path.join(__dirname, '../font/Open Sans/static/OpenSans-Regular.ttf'), { family: 'Open Sans' });
+registerFont(path.join(__dirname, '../font/Open Sans/static/OpenSans-Bold.ttf'), { family: 'Open Sans', weight: 'bold' });
+registerFont(path.join(__dirname, '../font/Open Sans/static/OpenSans-Medium.ttf'), { family: 'Open Sans', weight: '500' });
+registerFont(path.join(__dirname, '../font/Open Sans/static/OpenSans-SemiBold.ttf'), { family: 'Open Sans', weight: '600' });
 
 /**
  * Generates a summary image containing total countries,
@@ -22,18 +28,18 @@ const generateSummaryImage = async ({ total, top5, timestamp }) => {
     ctx.fillStyle = '#f0f0f0';
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = '#222';
-    ctx.font = 'bold 26px sans-serif';
+    ctx.font = 'bold 26px "Open Sans"';
     ctx.textAlign = 'center';
     ctx.fillText(' Countries Summary', width / 2, 50);
-    ctx.font = '18px sans-serif';
+    ctx.font = '18px "Open Sans"';
     ctx.fillText(`Total Countries: ${total}`, width / 2, 100);
 
-    ctx.font = '14px sans-serif';
+    ctx.font = '14px "Open Sans"';
     ctx.fillText(`Last Refreshed: ${new Date(timestamp).toLocaleString()}`, width / 2, 130);
-    ctx.font = 'bold 20px sans-serif';
+    ctx.font = 'bold 20px "Open Sans"';
     ctx.fillText('Top 5 Countries by Estimated GDP', width / 2, 180);
     ctx.textAlign = 'left';
-    ctx.font = '16px sans-serif';
+    ctx.font = 'bold 18px "Open Sans"';
 
     for (let i = 0; i < top5.length; i++) {
       const country = top5[i];
@@ -50,8 +56,10 @@ const generateSummaryImage = async ({ total, top5, timestamp }) => {
           ctx.fillRect(50, y - 25, 50, 30);
           ctx.strokeStyle = '#999';
           ctx.strokeRect(50, y - 25, 50, 30);
-          ctx.fillStyle = '#222';
+          ctx.fillStyle = '#000000';
         }
+      } else {
+        ctx.fillStyle = '#000000';
       }
       const gdpFormatted = country.estimated_gdp
         ? `$${country.estimated_gdp.toLocaleString()}`
